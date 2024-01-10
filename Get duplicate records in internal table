@@ -1,0 +1,49 @@
+
+" Get records duplicate
+
+TYPES: BEGIN OF ty_registro,
+         interlocutor TYPE c LENGTH 10,
+         importe      TYPE i,
+       END OF ty_registro.
+
+DATA: lt_tabla     TYPE STANDARD TABLE OF ty_registro,
+      lt_repetidos TYPE STANDARD TABLE OF ty_registro,
+      lv_cont      TYPE i.
+
+APPEND VALUE #( interlocutor = '3000' importe = 700   ) TO lt_tabla.
+APPEND VALUE #( interlocutor = '3000' importe = 1020  ) TO lt_tabla.
+APPEND VALUE #( interlocutor = '3000' importe = 500   ) TO lt_tabla.
+APPEND VALUE #( interlocutor = '3000' importe = 400   ) TO lt_tabla.
+APPEND VALUE #( interlocutor = '3000' importe = 500   ) TO lt_tabla.
+APPEND VALUE #( interlocutor = '3000' importe = 1020  ) TO lt_tabla.
+
+DATA(lt_aux) = lt_tabla[].
+
+LOOP AT lt_aux ASSIGNING FIELD-SYMBOL(<fs_aux>).
+  <fs_aux>-importe = abs( <fs_aux>-importe ). " valor absoluto
+ENDLOOP.
+
+SORT lt_aux BY importe.
+
+DELETE ADJACENT DUPLICATES FROM lt_aux COMPARING interlocutor importe.
+
+IF lt_aux NE lt_tabla.
+
+  LOOP AT lt_aux ASSIGNING <fs_aux>.
+
+    CLEAR lv_cont.
+
+    LOOP AT lt_tabla ASSIGNING FIELD-SYMBOL(<fs_tabla>) WHERE interlocutor = <fs_aux>-interlocutor AND importe = <fs_aux>-importe.
+
+      ADD 1 TO lv_cont.
+      IF lv_cont > 1.
+
+        APPEND <fs_tabla> TO lt_repetidos.
+
+      ENDIF.
+
+    ENDLOOP.
+
+  ENDLOOP.
+
+ENDIF.
