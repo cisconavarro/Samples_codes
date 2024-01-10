@@ -1,0 +1,6 @@
+
+Data: ld_iv_path type string.
+  CALL METHOD cl_fbicrc_gos_services=>split_path( EXPORTING iv_path     = ld_iv_path
+                                                  IMPORTING ev_filename = DATA(ld_ev_filename)
+                                                            ev_path     = DATA(ld_ev_path)
+                                                            ev_pserver  = DATA(ld_ev_pserver) ).
